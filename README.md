@@ -244,17 +244,17 @@ plot_params <- list(
 # Process a selected FCS file and apply signal transformation
 dat <- MBR_process(
   fcs_files,
-  file_index = 1,                                  # index of the FCS file to process
+  file_index = 1,                                    # index of the FCS file to process
   transformation = function(x) 10^((4 * x) / 65000), # transformation function for scaling
-  column_mapping = column_mapping                  # defined channel mapping
+  column_mapping = column_mapping                    # defined channel mapping
 )
 
-# Prepare SOM cluster bins for downstream visualization
+# Prepare SOM clusters for downstream visualization
 bins <- MBR_prepare(
   cohonen_information,
-  selected_rows = selected_rows,                   # selected SOM clusters
+  selected_rows = selected_rows,                     # selected SOM clusters
   transformation = function(x) 10^((4 * x) / 65000), # transformation function for scaling
-  column_mapping = column_mapping                  # defined channel mapping
+  column_mapping = column_mapping                    # defined channel mapping
 )
 
 # Generate flow cytometry plots for selected channels and populations
