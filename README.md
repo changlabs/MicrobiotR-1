@@ -242,12 +242,12 @@ MBR_save(
 # Pre-processing
 # Load metadata and feature abundance table
 meta_16s <- read.delim(
-  '/Volumes/My Passport/microbiotr_paper/final/Publication/16s/bac_meta.txt',
+  '/bac_meta.txt',
   header = TRUE,
   row.names = 1
 )
 count_table_16s <- read.delim(
-  '/Volumes/My Passport/microbiotr_paper/final/Publication/16s/bac_data.txt',
+  '/bac_data.txt',
   header = TRUE,
   row.names = 1
 )
@@ -270,14 +270,14 @@ MBR_stat(
   group_col = 'Group',             # column name in metadata containing group labels
   meta_data = meta_final,          # metadata files
   test_type = 'wilcox',            # statistical test method
-  out_path = '/Volumes/My Passport/microbiotr_paper/final/Publication/16s', # directory to save results
+  out_path = './', # directory to save results
   correction = 'none',             # multiple testing correction method
   cutoff = 0.1                     # significance threshold for adjusted or raw p-values
 )
 
 MBR_fs(
   significant_data,                # input dataframe containing significant features
-  out_path = '/Volumes/My Passport/microbiotr_paper/final/Publication/16s', # directory to save feature selection outputs
+  out_path = './', # directory to save feature selection outputs
   nfolds_cv = 5,                   # number of folds for cross-validation
   rfe_size = 125,                  # maximum number of features evaluated during recursive feature elimination (RFE)
   top_n_features = 10,             # number of top-ranked features to retain
@@ -291,7 +291,7 @@ MBR_ml(
   data = MBR_selected_features,        # feature table 
   meta_data = meta_16s,          # metadata files
   group_name = 'Group',             # column name in metadata containing group labels
-  out_path = '/Volumes/My Passport/microbiotr_paper/final/Publication/16s', # directory to save output PDF and group file
+  out_path = './', # directory to save output PDF and group file
   reference_level = 'CD',            # reference group 
   width = 6,                        # width of the output plot PDF
   height = 6,                       # height of the output plot PDF
