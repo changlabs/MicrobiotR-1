@@ -125,6 +125,7 @@ MBR_beta(
 ## Feature selection
 ```markdown
 # Perform recursive feature elimination (RFE) for feature selection
+# Random seeds are internally fixed for reproducibility.
 MBR_fs(
   significant_data,                # dataframe containing features
   out_path = './',                 # directory to save output files
