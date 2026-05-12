@@ -303,3 +303,65 @@ MBR_ml(
 ```
 
 ![MBR 16S ROC plot](image/16S.png)
+
+
+
+## Application of transcriptomics data
+```markdown
+# Pre-processing
+# Load metadata and feature abundance table
+meta_rna <- read.delim(
+  '/Volumes/My Passport/microbiotr_paper/final/Publication/rnaseq/meta.txt',
+  header = TRUE,
+  row.names = 1
+)
+count_table_rna <- read_csv(
+  '/Volumes/My Passport/microbiotr_paper/final/Publication/rnaseq/rnaibd.csv'
+)
+
+# Remove genes/features with zero counts across all samples while retaining the gene identifier column (`Symbol`)
+count_table_clean <- count_table_rna %>%
+  select(
+    Symbol,
+    where(~ is.numeric(.) && sum(., na.rm = TRUE) > 0)
+  )
+
+# Convert the `Symbol` column into row names so that genes become rows prior to transposition
+count_df <- count_table_clean %>%
+  column_to_rownames(var = "Symbol")
+
+# Transpose the count table so that samples are rows and genes/features are columns
+count_t <- as.data.frame(t(count_df))
+
+# Reorder metadata to match the sample order in the feature table
+meta_final <- meta_rna[rownames(count_t), ]
+
+
+
+# Application of MicroBiotR
+MBR_stat(
+  data = count_t,                  # feature abundance table 
+  group_col = 'Group',             # column name in metadata containing group labels
+  meta_data = meta_rna,          # metadata files
+  test_type = 'wilcox',            # statistical test method
+  out_path = './', # directory to save results
+  correction = 'none',             # multiple testing correction method
+  cutoff = 0.00001                     # significance threshold for adjusted or raw p-values
+)
+
+MBR_ml(
+  data = significant_data,        # feature table 
+  meta_data = meta_rna,          # metadata files
+  group_name = 'Group',             # column name in metadata containing group labels
+  out_path = './', # directory to save output PDF and group file
+  reference_level = 'UC',            # reference group 
+  width = 6,                        # width of the output plot PDF
+  height = 6,                       # height of the output plot PDF
+  method = 'repeatedcv',           # resampling method
+  number = 5,                       # number of folds
+  repeats = 2                       # number of repeats
+)
+
+```
+
+![MBR transcriptomics ROC plot](image/RNA.png)
