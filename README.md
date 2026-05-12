@@ -399,7 +399,7 @@ MBR_ml(
   data = significant_data,        # feature table 
   meta_data = meta_rna,          # metadata files
   group_name = 'Group',             # column name in metadata containing group labels
-  out_path = './', # directory to save output PDF and group file
+  out_path = './',               # directory to save output PDF and group file
   reference_level = 'UC',            # reference group 
   width = 6,                        # width of the output plot PDF
   height = 6,                       # height of the output plot PDF
