@@ -84,18 +84,38 @@ MBR_stat(data = count_table, group_col = 'Group', meta_data = meta,
 
 ## Analysis
 ```markdown
-# Circular plot
-MBR_circle(data = significant_data, group_col = 'Group', meta_data = meta, width = 16, 
-         height = 16, out_path = './')
+# Generate a circular plot to visualize significant features across groups
+MBR_circle(
+  data = significant_data,          # dataframe containing features
+  group_col = 'Group',              # column name in metadata containing group labels
+  meta_data = meta,                 # metadata file
+  width = 16,                       # width of the output figure
+  height = 16,                      # height of the output figure
+  out_path = './'                   # directory to save output files
+)
 
-# Violin plot
-MBR_violin(data = significant_data, meta_data = meta, group_col = "Group",
-           pvalue_data = pvalue_data, p = "p.adj",colors = c('#FFADAD', '#DEDAF4'), cluster = 1948, out_path = './')
+# Generate a violin plot for a selected feature/cluster
+MBR_violin(
+  data = significant_data,          # dataframe containing features
+  meta_data = meta,                 # metadata file
+  group_col = "Group",              # column name in metadata containing group labels
+  pvalue_data = pvalue_data,        # statistical test result dataframe containing p-values
+  p = "p.adj",                      # column name containing adjusted p-values or raw p-values (p.value)
+  colors = c('#FFADAD', '#DEDAF4'), # colors used for group visualization
+  cluster = 1948,                   # selected feature/cluster ID for plotting
+  out_path = './'                   # directory to save output files
+)
 
-# PCOA
-# test should be one of 'wilcox', 'ttest', 'kruskal', or 'anova'
-MBR_beta(significant_data, out_path = './', test = 'wilcox', 
-       meta_data = meta, group_name = 'Group', colors = c('#FFADAD', '#DEDAF4'))
+# Perform beta diversity analysis and generate a PCoA plot
+# `test` should be one of 'wilcox', 'ttest', 'kruskal', or 'anova'
+MBR_beta(
+  significant_data,                 # dataframe containing features
+  out_path = './',                  # directory to save output files
+  test = 'wilcox',                  # statistical test method
+  meta_data = meta,                 # metadata file
+  group_name = 'Group',             # column name in metadata containing group labels
+  colors = c('#FFADAD', '#DEDAF4')  # colors used for group visualization
+)
 ```
 
 ![MBR Circle Plot](image/circle.png)
@@ -104,27 +124,43 @@ MBR_beta(significant_data, out_path = './', test = 'wilcox',
 
 ## Feature selection
 ```markdown
-# Feature selection
-MBR_fs(significant_data, out_path = './', 
-     nfolds_cv = 5, rfe_size=199, top_n_features =10,group_name = 'Group', 
-     meta_data = meta,ref_group = 'CD', colors = c('#FFADAD', '#DEDAF4'))
+# Perform recursive feature elimination (RFE) for feature selection
+MBR_fs(
+  significant_data,                # dataframe containing features
+  out_path = './',                 # directory to save output files
+  nfolds_cv = 5,                   # number of folds for cross-validation
+  rfe_size = 199,                  # maximum number of features evaluated during RFE
+  top_n_features = 10,             # number of top-ranked features to retain
+  group_name = 'Group',            # column name in metadata containing group labels
+  meta_data = meta,                # metadata dataframe corresponding to samples
+  ref_group = 'CD',                # reference/control group used for comparison
+  colors = c('#FFADAD', '#DEDAF4') # colors used for visualization plots
+)
 
-# Heatmap
-MBR_heatmap(data = MBR_selected_features[,1:184], 
-          cohonen_information = cohonen_information, 
-          out_path = './', scale = 'row', cluster_cols = F, 
-          cluster_rows = T, display_numbers = F)
+# Generate a heatmap for selected features
+MBR_heatmap(
+  data = MBR_selected_features[,1:184], # selected feature matrix for visualization
+  cohonen_information = cohonen_information, # cohonen clustering information
+  out_path = './',                  # directory to save output files
+  scale = 'row',                    # scaling method applied to rows
+  cluster_cols = FALSE,             # whether to cluster columns
+  cluster_rows = TRUE,              # whether to cluster rows
+  display_numbers = FALSE           # whether to display numeric values in the heatmap
+)
 
-# Correlation
+# Perform Mantel correlation analysis between selected features and metadata variables
 MBR_mantel(
-  data = MBR_selected_features[,1:10],
-  meta_data = meta,
-  clinical_cols = c("Clinical1", "Clinical2"),
-  demographic_cols = c("Demographic1", "Demographic2"),
-  spec_select_names = list(A = "Clinical", B = "Demographic"),
-  out_path = './',  
-  width = 6,
-  height = 6
+  data = MBR_selected_features[,1:10], # selected feature matrix
+  meta_data = meta,                    # metadata file
+  clinical_cols = c("Clinical1", "Clinical2"), # clinical variable columns
+  demographic_cols = c("Demographic1", "Demographic2"), # demographic variable columns
+  spec_select_names = list(
+    A = "Clinical",
+    B = "Demographic"
+  ),                                   # labels used for grouped variable categories
+  out_path = './',                     # directory to save output files
+  width = 6,                           # width of the output figure
+  height = 6                           # height of the output figure
 )
 ```
 ![MBR FS Plot1](image/fs1.png)
@@ -136,25 +172,27 @@ MBR_mantel(
 ## Machine learning
 ```markdown
 MBR_ml(
-  data = MBR_selected_features,        # your feature table (samples as rows, taxa as columns)
-  meta_data = meta,          # metadata dataframe (samples in same order as `data`)
-  group_name = 'Group',             # column name in metadata containing group labels
-  out_path = './',          # directory to save output PDF and group file
-  reference_level = 'CD',            # reference group (e.g., "A" or "Control")
-  width = 6,                        # width of the output plot PDF
-  height = 6,                       # height of the output plot PDF
-  method = 'repeatedcv',           # resampling method (e.g., repeated cross-validation)
-  number = 5,                       # number of folds
-  repeats = 2                       # number of repeats
+  data = MBR_selected_features,        # feature table 
+  meta_data = meta,                    # metadata file
+  group_name = 'Group',                # column name in metadata containing group labels
+  out_path = './',                     # directory to save output PDF and group file
+  reference_level = 'CD',              # reference group (e.g., "CD" or "HC")
+  width = 6,                           # width of the output plot PDF
+  height = 6,                          # height of the output plot PDF
+  method = 'repeatedcv',               # resampling method
+  number = 5,                          # number of folds
+  repeats = 2                          # number of repeats
 )
 
+# Generate a confusion matrix and classification performance summary
 MBR_conf(
-  data = MBR_selected_features,
-  meta_data = meta,
-  group_name = 'Group',
-  reference_level = 'CD',
-  out_path = './'
+  data = MBR_selected_features,    # feature table used for model evaluation
+  meta_data = meta,                # metadata file
+  group_name = 'Group',            # column name in metadata containing group labels
+  reference_level = 'CD',          # reference group (e.g., "CD" or "HC")
+  out_path = './'                  # directory to save output files
 )
+
 ```
 ![MBR ROC Plot](image/roc.png)
 ![MBR Confusion_Matrix Plot](image/conf.png)
