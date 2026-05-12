@@ -311,12 +311,12 @@ MBR_ml(
 # Pre-processing
 # Load metadata and feature abundance table
 meta_rna <- read.delim(
-  '/Volumes/My Passport/microbiotr_paper/final/Publication/rnaseq/meta.txt',
+  '/meta.txt',
   header = TRUE,
   row.names = 1
 )
 count_table_rna <- read_csv(
-  '/Volumes/My Passport/microbiotr_paper/final/Publication/rnaseq/rnaibd.csv'
+  '/rnaibd.csv'
 )
 
 # Remove genes/features with zero counts across all samples while retaining the gene identifier column (`Symbol`)
