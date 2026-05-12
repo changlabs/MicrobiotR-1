@@ -239,13 +239,13 @@ MBR_save(
 
 ## Application of 16S rRNA gene sequencing data
 ```markdown
+# Pre-processing
 # Load metadata and feature abundance table
 meta_16s <- read.delim(
   '/Volumes/My Passport/microbiotr_paper/final/Publication/16s/bac_meta.txt',
   header = TRUE,
   row.names = 1
 )
-
 count_table_16s <- read.delim(
   '/Volumes/My Passport/microbiotr_paper/final/Publication/16s/bac_data.txt',
   header = TRUE,
@@ -262,7 +262,9 @@ count_t <- as.data.frame(t(count_table_filtered))
 # Reorder metadata to match the sample order in the feature table
 meta_final <- meta_16s[rownames(count_t), ]
 
-# 3. 함수 재실행 (이번에는 'Taxa' 열을 따로 붙이지 말고 뒤집은 데이터 그대로 넣어보세요)
+
+
+# Application of MicroBiotR
 MBR_stat(
   data = count_t,                  # feature abundance table 
   group_col = 'Group',             # column name in metadata containing group labels
@@ -289,7 +291,7 @@ MBR_ml(
   data = MBR_selected_features,        # feature table 
   meta_data = meta_16s,          # metadata files
   group_name = 'Group',             # column name in metadata containing group labels
-  out_path = '/Volumes/My Passport/microbiotr_paper/final/Publication/16s',          # directory to save output PDF and group file
+  out_path = '/Volumes/My Passport/microbiotr_paper/final/Publication/16s', # directory to save output PDF and group file
   reference_level = 'CD',            # reference group 
   width = 6,                        # width of the output plot PDF
   height = 6,                       # height of the output plot PDF
