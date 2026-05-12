@@ -65,6 +65,7 @@ library(MicroBiotR)
 library(linkET)
 library(Biobase)
 library(flowCore)
+library(tidyverse)
 
 # load matadata
 meta<-read.delim('meta.txt',header = T, row.names = 1)
@@ -163,7 +164,7 @@ MBR_conf(
 MBR_reclustering(data = cohonen_information, num_clusters = 1000)
 ```
 
-## Flowcytometry dotplot
+## Flow cytometry dotplot
 ```markdown
 rawdata_path <- "/MappedFCS"
 
@@ -234,6 +235,69 @@ MBR_save(
   file_index = 1,
   rawdata_path = rawdata_path
 )
+```
+
+## Application of 16S rRNA gene sequencing data
+```markdown
+# Load metadata and feature abundance table
+meta_16s <- read.delim(
+  '/Volumes/My Passport/microbiotr_paper/final/Publication/16s/bac_meta.txt',
+  header = TRUE,
+  row.names = 1
+)
+
+count_table_16s <- read.delim(
+  '/Volumes/My Passport/microbiotr_paper/final/Publication/16s/bac_data.txt',
+  header = TRUE,
+  row.names = 1
+)
+
+# Remove features/taxa with zero counts across all samples
+col_sums <- colSums(count_table_16s)
+count_table_filtered <- count_table_16s[, col_sums > 0]
+
+# Transpose the count table so that samples are rows and taxa are columns
+count_t <- as.data.frame(t(count_table_filtered))
+
+# Reorder metadata to match the sample order in the feature table
+meta_final <- meta_16s[rownames(count_t), ]
+
+# 3. 함수 재실행 (이번에는 'Taxa' 열을 따로 붙이지 말고 뒤집은 데이터 그대로 넣어보세요)
+MBR_stat(
+  data = count_t,                  # feature abundance table 
+  group_col = 'Group',             # column name in metadata containing group labels
+  meta_data = meta_final,          # metadata files
+  test_type = 'wilcox',            # statistical test method
+  out_path = '/Volumes/My Passport/microbiotr_paper/final/Publication/16s', # directory to save results
+  correction = 'none',             # multiple testing correction method
+  cutoff = 0.1                     # significance threshold for adjusted or raw p-values
+)
+
+MBR_fs(
+  significant_data,                # input dataframe containing significant features
+  out_path = '/Volumes/My Passport/microbiotr_paper/final/Publication/16s', # directory to save feature selection outputs
+  nfolds_cv = 5,                   # number of folds for cross-validation
+  rfe_size = 125,                  # maximum number of features evaluated during recursive feature elimination (RFE)
+  top_n_features = 10,             # number of top-ranked features to retain
+  group_name = 'Group',            # column name in metadata containing class/group labels
+  meta_data = meta_16s,            # metadata files
+  ref_group = 'CD',                # reference/control group used for comparison
+  colors = c('#FFADAD', '#DEDAF4') # colors used for visualization plots
+)
+
+MBR_ml(
+  data = MBR_selected_features,        # feature table 
+  meta_data = meta_16s,          # metadata files
+  group_name = 'Group',             # column name in metadata containing group labels
+  out_path = '/Volumes/My Passport/microbiotr_paper/final/Publication/16s',          # directory to save output PDF and group file
+  reference_level = 'CD',            # reference group 
+  width = 6,                        # width of the output plot PDF
+  height = 6,                       # height of the output plot PDF
+  method = 'repeatedcv',           # resampling method
+  number = 5,                       # number of folds
+  repeats = 2                       # number of repeats
+)
+
 ```
 
 
