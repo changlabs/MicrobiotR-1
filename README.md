@@ -204,32 +204,36 @@ MBR_reclustering(data = cohonen_information, num_clusters = 1000)
 
 ## Flow cytometry dotplot
 ```markdown
+# Define the directory containing 'FCS files generated from SOM processing'
 rawdata_path <- "/MappedFCS"
 
 fcs_files <- MBR_read(rawdata_path)
 
-selected_rows <- c('V1269','V1544','V1020','V1252','V1118','V1117', 'V1295')
-
-
-column_mapping <- c(
-  "FSC PAR"        = "FSC.PAR",
-  "SSC"            = "SSC",
-  "Hoechst.Red.DNA"= "Hoechst.Red",   
-  "Hoechst.Red"    = "Hoechst.Red",
-  "Hoechst Red.DNA"    = "Hoechst.Red",
-  "FITC.hIgA2"     = "FITC",
-  "FITC"           = "FITC",
-  "APC.hIgA1"      = "APC",
-  "APC"            = "APC",
-  "Pe-TR.hIgG"     = "Pe.TR",
-  "Pe.TR.hIgG"     = "Pe.TR",
-  "Pe.TR"          = "Pe.TR",
-  "BV650.hIgM"     = "BV650",
-  "BV650"          = "BV650"
+# Define selected SOM cluster IDs to visualize
+selected_rows <- c(
+  'V1269','V1544','V1020',
+  'V1252','V1118','V1117','V1295'
 )
 
+# Define column name mappings between FCS channels and marker names
+column_mapping <- c(
+  "FSC PAR"         = "FSC.PAR",
+  "SSC"             = "SSC",
+  "Hoechst.Red.DNA" = "Hoechst.Red",
+  "Hoechst.Red"     = "Hoechst.Red",
+  "Hoechst Red.DNA" = "Hoechst.Red",
+  "FITC.hIgA2"      = "FITC",
+  "FITC"            = "FITC",
+  "APC.hIgA1"       = "APC",
+  "APC"             = "APC",
+  "Pe-TR.hIgG"      = "Pe.TR",
+  "Pe.TR.hIgG"      = "Pe.TR",
+  "Pe.TR"           = "Pe.TR",
+  "BV650.hIgM"      = "BV650",
+  "BV650"           = "BV650"
+)
 
-
+# Define marker/channel combinations for flow cytometry visualization
 plot_params <- list(
   list(x = "FSC.PAR", y = "SSC"),
   list(x = "FSC.PAR", y = "Hoechst.Red"),
@@ -237,28 +241,31 @@ plot_params <- list(
   list(x = "Pe.TR", y = "BV650")
 )
 
+# Process a selected FCS file and apply signal transformation
 dat <- MBR_process(
   fcs_files,
-  file_index = 1,
-  transformation = function(x) 10^((4 * x) / 65000),
-  column_mapping = column_mapping
+  file_index = 1,                                  # index of the FCS file to process
+  transformation = function(x) 10^((4 * x) / 65000), # transformation function for scaling
+  column_mapping = column_mapping                  # defined channel mapping
 )
 
+# Prepare SOM cluster bins for downstream visualization
 bins <- MBR_prepare(
   cohonen_information,
-  selected_rows = selected_rows,
-  transformation = function(x) 10^((4 * x) / 65000),
-  column_mapping = column_mapping
+  selected_rows = selected_rows,                   # selected SOM clusters
+  transformation = function(x) 10^((4 * x) / 65000), # transformation function for scaling
+  column_mapping = column_mapping                  # defined channel mapping
 )
 
-
+# Generate flow cytometry plots for selected channels and populations
 plots <- MBR_plot(
-  dat = dat,
-  bins = bins,
-  plot_params = plot_params,
-  selected_rows = selected_rows
+  dat = dat,                                       # processed flow cytometry data
+  bins = bins,                                     # processed SOM cluster bins
+  plot_params = plot_params,                       # marker/channel combinations for plotting
+  selected_rows = selected_rows                    # selected SOM clusters
 )
 
+# Display generated plots
 print(plots)
 ```
 
@@ -266,12 +273,13 @@ print(plots)
 
 ## Saving user-customized fcs file
 ```markdown
+# Save selected gated populations/clusters as a new FCS file
 MBR_save(
-  fcs_files = fcs_files,
-  dat = dat, 
-  selected_rows = c("V9", "V10"),
-  file_index = 1,
-  rawdata_path = rawdata_path
+  fcs_files = fcs_files,                           # list of input FCS files
+  dat = dat,                                       # processed flow cytometry data
+  selected_rows = c("V9", "V10"),                 # selected clusters to export
+  file_index = 1,                                  # index of the FCS file to save
+  rawdata_path = rawdata_path                      # directory containing raw FCS files
 )
 ```
 
